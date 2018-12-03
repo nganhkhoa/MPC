@@ -602,6 +602,8 @@ ASALocalRun/
 **/.DS_Store
 tests/
 **/*.jar
+!external/antrl4.jar
+!external/jasmin.jar
 **/*.mp
 parser/.antlr4
 parser/*.tokens
