@@ -25,7 +25,7 @@ More documentation is being built.
 
 
 ## Project Structure
-``
+```
 .
 ├── mpc.py
 ├── tests
@@ -74,7 +74,7 @@ More documentation is being built.
     ├── __init__.py
     ├── Utils.py
     └── Visitor.py
-``````
+```
 All files is categorized and put into their own folder, turning them to a module by using `__init__.py` and import them by using the syntax `from package.module import module`. This makes the code easier to read, easier to find code, rather than altering the system path. The files in parser are created by running antlr4 generator from the given `MP.g4` file. Import this module is a little hard, but an exception can be catch upon importing the module to generate the neccessary files and import the module afterward.
 
 Most of the code is of my own teacher, Nguyen Hua Phung, I have no plan to refactor all this code as the architecture is just right. So all rights go to my teacher. The only thing I do is refactor part of the code and implement the algorithm.
