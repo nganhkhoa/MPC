@@ -1,21 +1,25 @@
-import sys
 import os
 import subprocess
+import click
 
-from antlr4 import FileStream, CommonTokenStream  # Token
-from antlr4.error.ErrorListener import ConsoleErrorListener  # ErrorListener
+from antlr4 import FileStream, CommonTokenStream
+from antlr4.error.ErrorListener import ConsoleErrorListener
+
+from tools.genANTLR4 import generate, regenerate
 
 try:
-    from parser.MPLexer import MPLexer as Lexer
-    from parser.MPParser import MPParser as Parser
-    from astgen.ASTGeneration import ASTGeneration
-    from checker.StaticCheck import StaticChecker
-    from codegen.CodeGenerator import CodeGenerator
-except ModuleNotFoundError:
-    print('Generate ANTLR4 first')
-    print('python genANTLR4.py')
-    exit(1)
+    # dynamic loading of ANTLR4 files
+    from parser import MPLexer, MPParser  # type: ignore
+except ImportError:
+    generate()
+    from parser import MPLexer, MPParser   # type: ignore
 
+from astgen.ASTGeneration import ASTGeneration
+from checker.StaticCheck import StaticChecker
+from codegen.CodeGenerator import CodeGenerator
+
+Lexer = MPLexer.MPLexer         # load from module
+Parser = MPParser.MPParser      # load from module
 
 ANTLR_JAR = os.environ.get('ANTLR_LIB')
 JASMIN_JAR = './external/jasmin.jar'
@@ -43,7 +47,7 @@ class NewErrorListener(ConsoleErrorListener):
             offendingSymbol.text)
 
 
-def compile(inputfile):
+def compile(inputfile, output):
     lexer = Lexer(FileStream(inputfile))
     tokens = CommonTokenStream(lexer)
     try:
@@ -68,14 +72,14 @@ def compile(inputfile):
     checker = StaticChecker(asttree)
     checker.check()
 
-    path = os.path.dirname(inputfile)
+    path = output
     filename = os.path.basename(inputfile).split('.')[0]
+    jasmin_file = '{}/{}.j'.format(path, filename)
     codeGen = CodeGenerator()
     codeGen.gen(asttree, path, filename)
 
     subprocess.call(
-        # "java  -jar " + JASMIN_JAR + " " + path + "/MPClass.j",
-        "java -jar {} {}/{}.j -d {}".format(JASMIN_JAR, path, filename, path),
+        "java -jar {} {} -d {}".format(JASMIN_JAR, jasmin_file, path),
         shell=True,
         stderr=subprocess.STDOUT
     )
@@ -84,7 +88,6 @@ def compile(inputfile):
         iofile.write(open('libs/io.class', 'rb').read())
 
     subprocess.call(
-        # 'jar cvfm {}/{}.jar {}/manifest.mf {} {}.class'.format(
         'jar cvfe {0}.jar {0} io.class {0}.class'.format(
             filename
         ),
@@ -93,20 +96,42 @@ def compile(inputfile):
         stderr=subprocess.STDOUT
     )
 
-    os.remove('{}/{}.j'.format(path, filename))
+    os.remove(jasmin_file)
     os.remove('{}/{}.class'.format(path, filename))
     os.remove('{}/io.class'.format(path))
 
 
-if __name__ == "__main__":
-    argv = sys.argv
-    if len(argv) != 2:
-        exit(1)
+@click.command()
+@click.argument('file')
+@click.option(
+    '--output', default='',
+    help='Where the jar file will be after compile')
+@click.option(
+    '--regen', is_flag=True,
+    help='Regenerate antlr4 files and exit'
+)
+def main(file, output, regen):
+    if regen:
+        regenerate()
+        print("ANTLR4 files regenerate succesfully")
+        return
 
+    if output == '':
+        output = os.path.dirname(file)
+    else:
+        # check if directory, create
+
+        # if file path, then
+        pass
+
+    print("Compiling {}".format(os.path.relpath(file)))
     try:
-        print("Compiling {}".format(os.path.relpath(argv[1])))
-        compile(argv[1])
+        compile(file, output)
     except BaseException as e:
         print(e)
         exit(1)
     print("Compiled successfully")
+
+
+if __name__ == "__main__":
+    main()

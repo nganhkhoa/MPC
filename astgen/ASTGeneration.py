@@ -2,19 +2,15 @@ from parser.MPVisitor import MPVisitor
 from parser.MPParser import MPParser
 from functools import reduce
 
-# * is not a good use case
 from utils.AST import (
     IntType,
     FloatType,
     BoolType,
     StringType,
     ArrayType,
-    # VoidType,
     Program,
-    # Decl,
     VarDecl,
     FuncDecl,
-    # Stmt,
     Assign,
     If,
     While,
@@ -24,14 +20,11 @@ from utils.AST import (
     Return,
     With,
     CallStmt,
-    # Expr,
     BinaryOp,
     UnaryOp,
     CallExpr,
-    # LHS,
     Id,
     ArrayCell,
-    # Literal,
     IntLiteral,
     FloatLiteral,
     StringLiteral,

@@ -2,46 +2,23 @@ from utils.Utils import Utils
 from utils.Visitor import BaseVisitor
 from checker.StaticCheck import MType, Symbol
 from utils.AST import (
-    # Type,
     IntType,
     FloatType,
     BoolType,
     StringType,
-    # ArrayType,
     VoidType,
-    # Program,
-    # Decl,
-    # VarDecl,
     FuncDecl,
-    # Stmt,
     Assign,
-    # If,
     While,
-    # For,
-    # Break,
-    # Continue,
-    # Return,
-    # With,
-    # CallStmt,
-    # Expr,
     BinaryOp,
-    # UnaryOp,
-    # CallExpr,
-    # LHS,
     Id,
-    # ArrayCell,
-    # Literal,
     IntLiteral,
-    # FloatLiteral,
-    # StringLiteral,
-    # BooleanLiteral,
     ArrayPointerType,
     ClassType
 )
 from codegen.Emitter import Emitter
 from codegen.Frame import Frame
-from abc import ABC  # , abstractmethod
-# from functools import reduce
+from abc import ABC
 
 
 class CodeGenerator(Utils):

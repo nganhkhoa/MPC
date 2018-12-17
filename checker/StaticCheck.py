@@ -1,13 +1,11 @@
 from utils.Visitor import BaseVisitor
 from utils.Utils import Utils
 from checker.StaticError import (
-    # Kind,
     Function,
     Procedure,
     Variable,
     Parameter,
     Identifier,
-    # StaticError,
     Undeclared,
     Redeclared,
     TypeMismatchInExpression,
@@ -26,32 +24,8 @@ from utils.AST import (
     StringType,
     ArrayType,
     VoidType,
-    # Program,
-    # Decl,
-    # VarDecl,
     FuncDecl,
-    # Stmt,
-    # Assign,
-    # If,
-    # While,
-    # For,
-    # Break,
-    # Continue,
-    # Return,
-    # With,
-    # CallStmt,
-    # Expr,
-    # BinaryOp,
-    # UnaryOp,
     CallExpr,
-    # LHS,
-    # Id,
-    # ArrayCell,
-    # Literal,
-    # IntLiteral,
-    # FloatLiteral,
-    # StringLiteral,
-    # BooleanLiteral
 )
 from functools import reduce
 
@@ -75,9 +49,10 @@ class Symbol:
         self.value = value
 
     def __str__(self):
-        return 'Symbol({},{})'.format(
+        return 'Symbol({},{},{})'.format(
             self.name,
-            str(self.mtype)
+            str(self.mtype),
+            str(self.value)
         )
 
 
@@ -137,12 +112,6 @@ class StaticChecker(BaseVisitor, Utils):
         res = self.lookup(symbol.name.lower(), env, lambda e: e.name.lower())
         if res is not None:
             raise Redeclared(kind, symbol.name)
-
-    def mergeGlobal2Local(self, local_scope, global_scope):
-        for s in global_scope:
-            res = self.lookup(s.name, local_scope, lambda e: e.name.lower())
-            if res is None:
-                local_scope.append(s)
 
     def checkTypeCompatibility(self, lhs, rhs, error):
         # array check

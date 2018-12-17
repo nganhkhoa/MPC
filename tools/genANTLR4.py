@@ -3,23 +3,23 @@ import subprocess
 
 
 ANTLR_JAR = os.environ.get('ANTLR_LIB')
-JASMIN_JAR = './external/jasmin.jar'
 
 if ANTLR_JAR is None:
     # fall back, not recommended
-    ANTLR_JAR = './external/antrl4.jar'
+    ANTLR_JAR = '../external/antrl4.jar'
+
+files_from_antlr4 = [
+    'parser/MP.interp',
+    'parser/MPLexer.interp',
+    'parser/MPLexer.py',
+    'parser/MPLexer.tokens',
+    'parser/MPParser.py',
+    'parser/MP.tokens',
+    'parser/MPVisitor.py'
+]
 
 
 def generate():
-    files_from_antlr4 = [
-        'MP.interp',
-        'MPLexer.interp',
-        'MPLexer.py',
-        'MPLexer.tokens',
-        'MPParser.py',
-        'MP.tokens',
-        'MPVisitor.py'
-    ]
     if all(list(map(os.path.isfile, files_from_antlr4))):
         return
     gen_antlr_class_cmd = [
@@ -33,5 +33,7 @@ def generate():
     subprocess.run(gen_antlr_class_cmd)
 
 
-if __name__ == '__main__':
+def regenerate():
+    for f in files_from_antlr4:
+        os.remove(f)
     generate()
